@@ -29,7 +29,7 @@
 #define TMP101_I2C_DEVICE_ADDRESS_ADD0_PIN_HIGH     0x4A
 
 /**
- * Structure defining a handle describing a tmp101 device.
+ * Structure defining a handle describing a TMP101 device.
  */
 typedef struct {
 
@@ -47,4 +47,10 @@ typedef struct {
 
 } tmp101_handle_t;
 
-bool tmp101_read_temperature(tmp101_handle_t *handle);
+/**
+ * Uses the TMP101 sensor to take a single 12-bit measurement.
+ * @param handle The handle to the TMP101 sensor.
+ * @param temperature Buffer for the temperature sensor. Signed 8.4 fixed point value.
+ * @return True on success, false otherwise.
+ */
+bool tmp101_read_temperature(tmp101_handle_t *handle, int16_t *temperature);

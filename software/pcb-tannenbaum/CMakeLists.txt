@@ -24,7 +24,7 @@ set(CMAKE_C_STANDARD 11)
 #add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 
 #Uncomment for software floating point
-#add_compile_options(-mfloat-abi=soft)
+add_compile_options(-mfloat-abi=soft)
 
 add_compile_options(-mcpu=cortex-m0 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
@@ -48,7 +48,7 @@ endif ()
 
 include_directories(Core/Inc Drivers/STM32L0xx_HAL_Driver/Inc Drivers/STM32L0xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32L0xx/Include Drivers/CMSIS/Include Drivers/Components Application)
 
-add_definitions(-DUSE_HAL_DRIVER -DSTM32L011xx -DDEBUG)
+add_definitions(-DUSE_HAL_DRIVER -DSTM32L011xx -DUSE_FULL_LL_DRIVER -DDEBUG)
 
 file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*" "Application/*.*")
 

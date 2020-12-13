@@ -70,8 +70,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USER_BUTTON_Pin GPIO_PIN_14
 #define USER_BUTTON_GPIO_Port GPIOC
-#define DIN_Pin GPIO_PIN_1
-#define DIN_GPIO_Port GPIOA
+#define WS2812B_Pin GPIO_PIN_1
+#define WS2812B_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

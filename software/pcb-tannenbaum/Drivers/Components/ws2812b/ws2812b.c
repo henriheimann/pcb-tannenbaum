@@ -1,3 +1,4 @@
+#include <stm32l0xx_ll_utils.h>
 #include "ws2812b.h"
 
 static uint8_t pwm_timings_buffer[2 * WS2812B_NUM_COLORS * 8] = {0};
@@ -16,9 +17,9 @@ static void prepare_led_timings(ws2812b_handle_t *handle, uint8_t led, uint8_t o
 		uint8_t timings_offset = offset + color_index * 8 + 7;
 		for (uint8_t i = 0; i < 8; i++) {
 			if (color & 0x1u) {
-				pwm_timings_buffer[timings_offset - i] = 20;
+				pwm_timings_buffer[timings_offset - i] = 27;
 			} else {
-				pwm_timings_buffer[timings_offset - i] = 8;
+				pwm_timings_buffer[timings_offset - i] = 11;
 			}
 			color >>= 1u;
 		}
@@ -43,42 +44,54 @@ bool ws2812b_transmit(ws2812b_handle_t *handle)
 	pwm_pulse_half_finished = false;
 	next_led_index = 2;
 
-	__HAL_TIM_SET_COMPARE(handle->timer_handle, handle->timer_channel, 0);
-	HAL_TIM_Base_Start(handle->timer_handle);
+	LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_3, (uint32_t)&TIM2->CCR2);
+	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_3, (uint32_t)&pwm_timings_buffer);
+	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, sizeof(pwm_timings_buffer));
+	LL_TIM_OC_SetCompareCH2(TIM2, 0);
+	LL_TIM_EnableDMAReq_CC2(TIM2);
 
-	if (HAL_TIM_PWM_Start_DMA(handle->timer_handle, handle->timer_channel,
-						   (uint32_t*)pwm_timings_buffer, sizeof(pwm_timings_buffer))) return false;
+	LL_DMA_ClearFlag_TC3(DMA1);
+	LL_DMA_ClearFlag_HT3(DMA1);
+	LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_3);
+	LL_DMA_EnableIT_HT(DMA1, LL_DMA_CHANNEL_3);
+	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 
-	while (next_led_index < handle->num_leds) {
+	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
+	LL_TIM_EnableCounter(TIM2);
+
+	while (next_led_index < (handle->num_leds + 2)) {
 		if (pwm_pulse_half_finished) {
 			pwm_pulse_half_finished = false;
 			if (next_led_index < handle->num_leds) {
-				prepare_led_timings(handle, next_led_index++, PWM_TIMINGS_BUFFER_LED0);
+				prepare_led_timings(handle, next_led_index, PWM_TIMINGS_BUFFER_LED0);
 			} else {
 				prepare_led_zeros(PWM_TIMINGS_BUFFER_LED0);
 			}
+			next_led_index++;
 		} else if (pwm_pulse_finished) {
 			pwm_pulse_finished = false;
 			if (next_led_index < handle->num_leds) {
-				prepare_led_timings(handle, next_led_index++, PWM_TIMINGS_BUFFER_LED1);
+				prepare_led_timings(handle, next_led_index, PWM_TIMINGS_BUFFER_LED1);
 			} else {
 				prepare_led_zeros(PWM_TIMINGS_BUFFER_LED1);
 			}
+			next_led_index++;
 		}
 	}
 
-	HAL_TIM_PWM_Stop_DMA(handle->timer_handle, handle->timer_channel);
-	HAL_TIM_Base_Stop(handle->timer_handle);
+	LL_TIM_DisableCounter(TIM2);
+	LL_TIM_CC_DisableChannel(TIM2, LL_TIM_CHANNEL_CH2);
+	LL_DMA_DisableChannel(DMA1, LL_DMA_CHANNEL_3);
 
 	return true;
 }
 
-void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
+void ws2812b_finished_isr()
 {
 	pwm_pulse_finished = true;
 }
 
-void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim)
+void ws2812b_half_finished_isr()
 {
 	pwm_pulse_half_finished = true;
 }

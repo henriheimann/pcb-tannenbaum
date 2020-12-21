@@ -6,27 +6,27 @@
 #include "application.h"
 
 static tmp101_handle_t tmp101_handle = {
-		.i2c_handle = &hi2c1,
+		.i2c_handle = I2C1,
 		.device_address = TMP101_I2C_DEVICE_ADDRESS_ADD0_PIN_HIGH
 };
 
 static ws2812b_handle_t ws2812b_handle = {
-	.timer_handle = &htim2,
-	.timer_channel = TIM_CHANNEL_2,
+	.timer_handle = TIM2,
+	.timer_channel = LL_TIM_CHANNEL_CH2,
 	.num_leds = 12,
 	.led_color_buffer = {
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0,
-			0, 0, 0
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 0, 1,
+			0, 1, 0,
+			1, 0, 0,
+			0, 1, 0,
+			1, 1, 0
 	}
 };
 
@@ -43,14 +43,13 @@ _Noreturn void application_main()
 {
 	ws2812b_transmit(&ws2812b_handle);
 
-	uint32_t last_update = HAL_GetTick();
+	uint32_t last_update = SysTick->CTRL;
 	bool last_button_state = false;
 	bool instant_update = false;
 	int state = 0;
 
 	while (1) {
-
-		if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_SET) {
+		if (LL_GPIO_ReadInputPort(USER_BUTTON_GPIO_Port) & USER_BUTTON_Pin) {
 			last_button_state = false;
 		} else if (last_button_state == false) {
 			last_button_state = true;
@@ -58,15 +57,24 @@ _Noreturn void application_main()
 			state = (state + 1) % 2;
 		}
 
-		if (instant_update || ((HAL_GetTick() - last_update) > 250)) {
-			last_update = HAL_GetTick();
+		if (instant_update || ((SysTick->CTRL - last_update) > 250)) {
+			last_update = SysTick->CTRL;
 			instant_update = false;
 
-			if (state == 0) {
+			/*int16_t temperature;
+			tmp101_read_temperature(&tmp101_handle, &temperature);
+			if (temperature > 0) {
+				ws2812b_handle.led_color_buffer[0] = 0;
+			}*/
+
+			/*if (state == 0) {
 				for (uint8_t led_index = 0; led_index < 12 * WS2812B_NUM_COLORS; led_index++) {
 					ws2812b_handle.led_color_buffer[led_index] = 0;
 				}
 			} else if (state == 1) {
+				if (temperature > 20) {
+					ws2812b_handle.led_color_buffer[0] = 1;
+				}*/
 				for (uint8_t led_index = 0; led_index < 12; led_index++) {
 					switch (random() % 6) {
 						case 0:
@@ -100,10 +108,12 @@ _Noreturn void application_main()
 							ws2812b_handle.led_color_buffer[led_index * 3 + 2] = 1;
 							break;
 					}
-				}
+				//}
 			}
 
 			ws2812b_transmit(&ws2812b_handle);
+
+			LL_mDelay(1000);
 		}
 	}
 }

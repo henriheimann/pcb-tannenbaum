@@ -76,6 +76,7 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define USER_BUTTON_Pin LL_GPIO_PIN_14
 #define USER_BUTTON_GPIO_Port GPIOC
+#define USER_BUTTON_EXTI_IRQn EXTI4_15_IRQn
 #define WS2812B_Pin LL_GPIO_PIN_1
 #define WS2812B_GPIO_Port GPIOA
 #ifndef NVIC_PRIORITYGROUP_0

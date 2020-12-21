@@ -78,6 +78,13 @@ int main(void)
 
   /* System interrupt init*/
 
+  /** PVD Configuration
+  */
+  LL_PWR_SetPVDLevel(LL_PWR_PVDLEVEL_4);
+  /** Enable the PVD Output
+  */
+  LL_PWR_EnablePVD();
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */

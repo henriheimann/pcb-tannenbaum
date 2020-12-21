@@ -78,20 +78,24 @@ _Noreturn void application_main()
 
 			int16_t temperature;
 			tmp101_read_temperature(&tmp101_handle, &temperature);
-			temperature = temperature / 160;
-			if (temperature > 25) {
-				ws2812b_handle.led_color_buffer[0] = 0;
-			}
+			temperature = temperature / 16;
 
 			uint32_t voltage_below_2_5V = LL_PWR_IsActiveFlag_PVDO();
 
-			/*for (uint8_t led_index = 0; led_index < 12; led_index++) {
-				uint8_t random_number = voltage_below_2_5V ? random() % 3 : random() % 6;
+			for (uint8_t led_index = 0; led_index < 12; led_index++) {
+				uint8_t random_number;
+				if (temperature >= 28) {
+					random_number = random() % 2;
+				} else if (voltage_below_2_5V) {
+					random_number = random() % 3;
+				} else {
+					random_number = random() % 6;
+				}
 				switch (random_number) {
 					case 0:
 					default:
 						ws2812b_handle.led_color_buffer[led_index * 3 + 0] = 1;
-						ws2812b_handle.led_color_buffer[led_index * 3 + 1] = 0;
+						ws2812b_handle.led_color_buffer[led_index * 3 + 1] = 1;
 						ws2812b_handle.led_color_buffer[led_index * 3 + 2] = 0;
 						break;
 					case 1:
@@ -101,7 +105,7 @@ _Noreturn void application_main()
 						break;
 					case 2:
 						ws2812b_handle.led_color_buffer[led_index * 3 + 0] = 1;
-						ws2812b_handle.led_color_buffer[led_index * 3 + 1] = 1;
+						ws2812b_handle.led_color_buffer[led_index * 3 + 1] = 0;
 						ws2812b_handle.led_color_buffer[led_index * 3 + 2] = 0;
 						break;
 					case 3:
@@ -120,7 +124,7 @@ _Noreturn void application_main()
 						ws2812b_handle.led_color_buffer[led_index * 3 + 2] = 1;
 						break;
 				}
-			}*/
+			}
 
 			ws2812b_transmit(&ws2812b_handle);
 		}

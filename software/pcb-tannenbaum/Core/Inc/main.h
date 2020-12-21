@@ -28,6 +28,7 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#include "stm32l0xx_ll_adc.h"
 #include "stm32l0xx_ll_dma.h"
 #include "stm32l0xx.h"
 #include "stm32l0xx_ll_i2c.h"

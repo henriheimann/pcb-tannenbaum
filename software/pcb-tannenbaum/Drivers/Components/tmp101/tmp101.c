@@ -13,7 +13,7 @@ typedef enum
 
 static bool i2c_transmit(I2C_TypeDef *i2c_handle, uint8_t device_address, uint8_t *data, size_t length)
 {
-	LL_I2C_HandleTransfer(i2c_handle, device_address, LL_I2C_ADDRSLAVE_7BIT, length,
+	LL_I2C_HandleTransfer(i2c_handle, (device_address << 1u), LL_I2C_ADDRSLAVE_7BIT, length,
 	                      LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_START_WRITE);
 
 	while (!LL_I2C_IsActiveFlag_STOP(i2c_handle)) {
@@ -29,7 +29,7 @@ static bool i2c_transmit(I2C_TypeDef *i2c_handle, uint8_t device_address, uint8_
 
 static bool i2c_receive(I2C_TypeDef *i2c_handle, uint8_t device_address, uint8_t *buffer, size_t length)
 {
-	LL_I2C_HandleTransfer(i2c_handle, device_address, LL_I2C_ADDRSLAVE_7BIT, length,
+	LL_I2C_HandleTransfer(i2c_handle, (device_address << 1u), LL_I2C_ADDRSLAVE_7BIT, length,
 	                      LL_I2C_MODE_AUTOEND, LL_I2C_GENERATE_START_WRITE);
 
 	while (!LL_I2C_IsActiveFlag_STOP(i2c_handle)) {

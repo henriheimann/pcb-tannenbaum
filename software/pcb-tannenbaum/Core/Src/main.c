@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
@@ -80,7 +81,7 @@ int main(void)
 
   /** PVD Configuration
   */
-  LL_PWR_SetPVDLevel(LL_PWR_PVDLEVEL_4);
+  LL_PWR_SetPVDLevel(LL_PWR_PVDLEVEL_3);
   /** Enable the PVD Output
   */
   LL_PWR_EnablePVD();
@@ -101,6 +102,7 @@ int main(void)
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_ADC_Init();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 

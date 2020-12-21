@@ -29,7 +29,7 @@ static void prepare_led_timings(ws2812b_handle_t *handle, uint8_t led, uint8_t o
 static void prepare_led_zeros(uint8_t base_offset)
 {
 	for (uint8_t offset = 0; offset < 3 * 8; offset++) {
-		pwm_timings_buffer[base_offset + offset] = 8;
+		pwm_timings_buffer[base_offset + offset] = 0;
 	}
 }
 
@@ -47,17 +47,20 @@ bool ws2812b_transmit(ws2812b_handle_t *handle)
 	LL_DMA_SetPeriphAddress(DMA1, LL_DMA_CHANNEL_3, (uint32_t)&TIM2->CCR2);
 	LL_DMA_SetMemoryAddress(DMA1, LL_DMA_CHANNEL_3, (uint32_t)&pwm_timings_buffer);
 	LL_DMA_SetDataLength(DMA1, LL_DMA_CHANNEL_3, sizeof(pwm_timings_buffer));
-	LL_TIM_OC_SetCompareCH2(TIM2, 0);
-	LL_TIM_EnableDMAReq_CC2(TIM2);
-
 	LL_DMA_ClearFlag_TC3(DMA1);
 	LL_DMA_ClearFlag_HT3(DMA1);
 	LL_DMA_EnableIT_TC(DMA1, LL_DMA_CHANNEL_3);
 	LL_DMA_EnableIT_HT(DMA1, LL_DMA_CHANNEL_3);
-	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
+
+	LL_TIM_ClearFlag_CC2OVR(TIM2);
+	LL_TIM_ClearFlag_CC2(TIM2);
+	LL_TIM_OC_SetCompareCH2(TIM2, 0);
+	LL_TIM_EnableDMAReq_CC2(TIM2);
 
 	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
 	LL_TIM_EnableCounter(TIM2);
+
+	LL_DMA_EnableChannel(DMA1, LL_DMA_CHANNEL_3);
 
 	while (next_led_index < (handle->num_leds + 2)) {
 		if (pwm_pulse_half_finished) {

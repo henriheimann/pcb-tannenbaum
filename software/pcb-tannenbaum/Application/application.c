@@ -77,7 +77,7 @@ _Noreturn void application_main()
 			ticks_elapsed = 0;
 
 			int16_t temperature;
-			tmp101_read_temperature(&tmp101_handle, &temperature);
+			tmp101_read_temperature(&tmp101_handle, TMP101_RESOLUTION_9BITS, &temperature);
 			temperature = temperature / 16;
 
 			uint32_t voltage_below_2_5V = LL_PWR_IsActiveFlag_PVDO();
@@ -129,7 +129,7 @@ _Noreturn void application_main()
 			ws2812b_transmit(&ws2812b_handle);
 		}
 
-		if ((SysTick->CTRL & SysTick_CTRL_COUNTFLAG_Msk) != 0U) {
+		if (LL_SYSTICK_IsActiveCounterFlag()) {
 			ticks_elapsed++;
 		}
 

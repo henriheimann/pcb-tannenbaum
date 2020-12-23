@@ -12,6 +12,7 @@
 	(defined STM32L081xx) || (defined STM32L082xx) || (defined STM32L083xx)
 #include "stm32l0xx_ll_i2c.h"
 #include "stm32l0xx_ll_utils.h"
+#include <stm32l0xx_ll_cortex.h>
 #else
 #error Platform not implemented
 #endif
@@ -23,6 +24,14 @@
 #define TMP101_I2C_DEVICE_ADDRESS_ADD0_PIN_LOW      0x48
 #define TMP101_I2C_DEVICE_ADDRESS_ADD0_PIN_FLOAT    0x49
 #define TMP101_I2C_DEVICE_ADDRESS_ADD0_PIN_HIGH     0x4A
+
+typedef enum
+{
+	TMP101_RESOLUTION_9BITS = 0x00,
+	TMP101_RESOLUTION_10BITS = 0x01,
+	TMP101_RESOLUTION_11BITS = 0x02,
+	TMP101_RESOLUTION_12BITS = 0x03
+} tmp101_resolution_t;
 
 /**
  * Structure defining a handle describing a TMP101 device.
@@ -44,9 +53,10 @@ typedef struct {
 } tmp101_handle_t;
 
 /**
- * Uses the TMP101 sensor to take a single 12-bit measurement.
+ * Uses the TMP101 sensor to take a single measurement in one-shot mode.
  * @param handle The handle to the TMP101 sensor.
+ * @param resolution The resolution to use for the measurement (affects required time).
  * @param temperature Buffer for the temperature sensor. Signed 8.4 fixed point value.
  * @return True on success, false otherwise.
  */
-bool tmp101_read_temperature(tmp101_handle_t *handle, int16_t *temperature);
+bool tmp101_read_temperature(tmp101_handle_t *handle, tmp101_resolution_t resolution, int16_t *temperature);

@@ -45,7 +45,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(${includes} Drivers/Components Application)
+include_directories(${includes} Drivers/Components Drivers/MCU Application)
 
 add_definitions(${defines})
 

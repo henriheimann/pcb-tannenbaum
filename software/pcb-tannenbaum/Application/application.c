@@ -73,6 +73,16 @@ _Noreturn void application_main()
 	uint32_t ticks_elapsed = 500;
 
 	while (1) {
+
+		if (LL_SYSTICK_IsActiveCounterFlag()) {
+			ticks_elapsed++;
+		}
+
+		if (user_button_pressed) {
+			user_button_pressed = false;
+			enter_standby_mode();
+		}
+
 		if (ticks_elapsed > 500) {
 			ticks_elapsed = 0;
 
@@ -127,15 +137,6 @@ _Noreturn void application_main()
 			}
 
 			ws2812b_transmit(&ws2812b_handle);
-		}
-
-		if (LL_SYSTICK_IsActiveCounterFlag()) {
-			ticks_elapsed++;
-		}
-
-		if (user_button_pressed) {
-			user_button_pressed = false;
-			enter_standby_mode();
 		}
 	}
 }

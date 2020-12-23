@@ -46,7 +46,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Core/Inc Drivers/STM32L0xx_HAL_Driver/Inc Drivers/CMSIS/Device/ST/STM32L0xx/Include Drivers/CMSIS/Include Drivers/Components Application)
+include_directories(Core/Inc Drivers/STM32L0xx_HAL_Driver/Inc Drivers/CMSIS/Device/ST/STM32L0xx/Include Drivers/CMSIS/Include Drivers/Components Drivers/MCU Application)
 
 add_definitions(-DHSE_VALUE=8000000 -DHSE_STARTUP_TIMEOUT=100 -DHSI_VALUE=16000000 -DDEBUG -DLSE_STARTUP_TIMEOUT=5000 -DLSE_VALUE=32768 -DDATA_CACHE_ENABLE=1 -DLSI_VALUE=37000 -DMSI_VALUE=2097000 -DVDD_VALUE=3300 -DINSTRUCTION_CACHE_ENABLE=1 -DSTM32L011xx -DUSE_FULL_LL_DRIVER -DPREFETCH_ENABLE=0)
 
